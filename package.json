@@ -18,7 +18,9 @@
     "gulp-terser": "^2.1.0",
     "gulp-sourcemaps": "^3.0.0",
     "browser-sync": "^2.29.3",
-    "del": "^6.1.1"
+    "del": "^6.1.1",
+    "gulp-imagemin": "^8.0.0",
+    "gulp-htmlmin": "^5.0.1"
   },
   "browserslist": [
     "last 2 versions",
