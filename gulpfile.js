@@ -12,6 +12,8 @@ const rename = require('gulp-rename');
 const sourcemaps = require('gulp-sourcemaps');
 const browserSync = require('browser-sync').create();
 const del = require('del');
+const imagemin = require('gulp-imagemin');
+const htmlmin = require('gulp-htmlmin');
 
 // File paths
 const paths = {
@@ -23,8 +25,13 @@ const paths = {
     src: 'assets/js/**/*.js',
     dest: 'dist/js/'
   },
+  images: {
+    src: 'assets/images/**/*.{jpg,jpeg,png,gif,svg}',
+    dest: 'dist/images/'
+  },
   html: {
-    src: '*.html'
+    src: '*.html',
+    dest: 'dist/'
   }
 };
 
@@ -59,27 +66,62 @@ function scripts() {
     .pipe(browserSync.stream());
 }
 
+// Optimize images
+function images() {
+  return gulp.src(paths.images.src)
+    .pipe(imagemin([
+      imagemin.mozjpeg({ quality: 80, progressive: true }),
+      imagemin.optipng({ optimizationLevel: 5 }),
+      imagemin.svgo({
+        plugins: [
+          { removeViewBox: false },
+          { cleanupIDs: false }
+        ]
+      })
+    ]))
+    .pipe(gulp.dest(paths.images.dest))
+    .pipe(browserSync.stream());
+}
+
+// Process HTML files
+function html() {
+  return gulp.src(paths.html.src)
+    .pipe(htmlmin({
+      collapseWhitespace: true,
+      removeComments: true,
+      removeRedundantAttributes: true,
+      removeScriptTypeAttributes: true,
+      removeStyleLinkTypeAttributes: true,
+      useShortDoctype: true
+    }))
+    .pipe(gulp.dest(paths.html.dest))
+    .pipe(browserSync.stream());
+}
+
 // Watch files for changes
 function watch() {
   browserSync.init({
     server: {
-      baseDir: './'
+      baseDir: 'dist/'
     }
   });
 
   gulp.watch(paths.styles.src, styles);
   gulp.watch(paths.scripts.src, scripts);
-  gulp.watch(paths.html.src).on('change', browserSync.reload);
+  gulp.watch(paths.images.src, images);
+  gulp.watch(paths.html.src, html);
 }
 
 // Define complex tasks
-const build = gulp.series(clean, gulp.parallel(styles, scripts));
+const build = gulp.series(clean, gulp.parallel(styles, scripts, images, html));
 const dev = gulp.series(build, watch);
 
 // Export tasks
 exports.clean = clean;
 exports.styles = styles;
 exports.scripts = scripts;
+exports.images = images;
+exports.html = html;
 exports.watch = watch;
 exports.build = build;
 exports.default = dev;
