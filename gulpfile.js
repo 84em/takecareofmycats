@@ -70,12 +70,12 @@ function scripts() {
 function images() {
   return gulp.src(paths.images.src)
     .pipe(imagemin([
-      imagemin.mozjpeg({ quality: 80, progressive: true }),
-      imagemin.optipng({ optimizationLevel: 5 }),
+      imagemin.mozjpeg({ quality: 95, progressive: true }),
+      imagemin.optipng({ optimizationLevel: 1 }),
       imagemin.svgo({
         plugins: [
-          { removeViewBox: false },
-          { cleanupIDs: false }
+          { name: 'removeViewBox', active: false },
+          { name: 'cleanupIDs', active: false }
         ]
       })
     ]))
