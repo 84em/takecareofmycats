@@ -14,6 +14,7 @@ const browserSync = require('browser-sync').create();
 const del = require('del');
 const imagemin = require('gulp-imagemin');
 const htmlmin = require('gulp-htmlmin');
+const replace = require('gulp-replace');
 
 // File paths
 const paths = {
@@ -86,6 +87,9 @@ function images() {
 // Process HTML files
 function html() {
   return gulp.src(paths.html.src)
+    .pipe(replace('assets/css/styles.css', 'css/styles.min.css'))
+    .pipe(replace('assets/js/main.js', 'js/main.min.js'))
+    .pipe(replace(/assets\/images\//g, 'images/'))
     .pipe(htmlmin({
       collapseWhitespace: true,
       removeComments: true,
@@ -102,7 +106,7 @@ function html() {
 function watch() {
   browserSync.init({
     server: {
-      baseDir: 'dist/'
+      baseDir: './'
     }
   });
 
